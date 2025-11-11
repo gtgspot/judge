@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compliance Analysis Learning System</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="title-group">
+        <h1>Compliance Analysis Workbench</h1>
+        <p class="subtitle">Learning-enhanced statutory compliance auditor</p>
+      </div>
+      <div class="header-actions">
+        <button id="load-sample-analyses" type="button" class="ghost-button">Load Sample Analyses</button>
+        <button id="clear-storage" type="button" class="ghost-button warning">Reset Storage</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel input-panel">
+        <h2>Document Ingestion</h2>
+        <form id="analysis-form" class="analysis-form">
+          <div class="form-row">
+            <label>
+              Document A Name
+              <input id="file-a-name" name="fileAName" type="text" placeholder="e.g. Charge Narrative" required />
+            </label>
+            <label>
+              Document B Name
+              <input id="file-b-name" name="fileBName" type="text" placeholder="e.g. Officer Statement" required />
+            </label>
+          </div>
+          <div class="form-row textarea-row">
+            <label class="textarea-group">
+              Document A Content
+              <textarea id="file-a-content" name="fileAContent" rows="12" placeholder="Paste or type the first document"></textarea>
+            </label>
+            <label class="textarea-group">
+              Document B Content
+              <textarea id="file-b-content" name="fileBContent" rows="12" placeholder="Paste or type the second document"></textarea>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Analysis Context / Notes
+              <textarea id="analysis-context" name="analysisContext" rows="4" placeholder="Optional context, rubric, or instructions"></textarea>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button id="run-analysis" type="submit" class="primary">Run Analysis</button>
+            <button id="export-report" type="button" class="secondary">Export Enhanced Report</button>
+          </div>
+        </form>
+
+        <section class="analysis-output" aria-live="polite">
+          <h3>Latest Analysis Summary</h3>
+          <div id="analysis-summary" class="analysis-summary empty-state">
+            <p>No analyses have been run yet.</p>
+          </div>
+          <div id="defect-detail" class="defect-detail hidden"></div>
+        </section>
+      </section>
+
+      <section class="panel intelligence-panel">
+        <h2>Learning Intelligence</h2>
+        <section id="insights-panel" class="insights-panel"></section>
+        <section id="cross-analysis" class="cross-analysis"></section>
+      </section>
+
+      <section class="panel timeline-panel">
+        <h2>Chronological Timeline</h2>
+        <section id="timeline-filters" class="timeline-filters"></section>
+        <section id="timeline-view" class="timeline-view"></section>
+      </section>
+    </main>
+
+    <template id="analysis-detail-template">
+      <article class="analysis-detail">
+        <header>
+          <h4></h4>
+          <p class="detail-timestamp"></p>
+        </header>
+        <section class="detail-section summary"></section>
+        <section class="detail-section defects"></section>
+        <section class="detail-section statutes"></section>
+      </article>
+    </template>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
