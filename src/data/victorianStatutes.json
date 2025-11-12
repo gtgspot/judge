@@ -1,0 +1,166 @@
+{
+  "Road_Safety_Act_1986": {
+    "sections": {
+      "49": {
+        "title": "Preliminary breath test",
+        "subsections": {
+          "1": {
+            "full_text": "A member of the police force may require a person to undergo a preliminary breath test...",
+            "elements": [
+              {
+                "name": "reason_to_believe",
+                "type": "subjective_prerequisite",
+                "keywords": ["reason to believe", "believed that", "formed the view"],
+                "required": true,
+                "absence_consequence": "No lawful authority to require test - test invalid"
+              },
+              {
+                "name": "specified_grounds",
+                "type": "objective_basis",
+                "grounds_list": [
+                  "has consumed alcohol",
+                  "has alcohol in their body",
+                  "is under the influence of alcohol",
+                  "has consumed a drug",
+                  "has a drug in their body",
+                  "is under the influence of a drug",
+                  "has driven a vehicle",
+                  "has been in charge of a vehicle"
+                ],
+                "required": true,
+                "absence_consequence": "Belief not grounded in statutory authority"
+              }
+            ]
+          }
+        }
+      },
+      "55D": {
+        "title": "Preliminary test must be in accordance with directions",
+        "subsections": {
+          "1": {
+            "full_text": "A preliminary breath test must be conducted in accordance with the directions for use of the breath analyzing instrument.",
+            "elements": [
+              {
+                "name": "in_accordance_with_directions",
+                "keywords": ["in accordance with", "directions for use", "as directed", "following directions"],
+                "required": true,
+                "absence_consequence": "Test inadmissible - s.55D(1) not satisfied"
+              }
+            ]
+          },
+          "2": {
+            "full_text": "The directions must be in writing unless the person who is required to undergo the test is able to read and understand English.",
+            "elements": [
+              {
+                "name": "written_or_oral_directions",
+                "oral_conditions": ["person literate in English", "person understands English"],
+                "written_required_if": ["person not literate", "person cannot understand English"],
+                "required": true,
+                "absence_consequence": "Procedural invalidity - direction requirement not met"
+              }
+            ]
+          }
+        }
+      },
+      "55E": {
+        "title": "Breath analyzing instrument taken to have been properly used",
+        "proper_performance_indicators": [
+          "device has approval for use under regulations",
+          "device used as designed by manufacturer",
+          "device in working order at time of use",
+          "device properly maintained per manufacturer specifications",
+          "approval number visible/recorded",
+          "calibration certificate current"
+        ],
+        "presumption": "Unless contrary proven, device presumed properly used if indicators present",
+        "rebuttal_burden": "Accused may adduce evidence device not properly used"
+      }
+    }
+  },
+  "Criminal_Procedure_Act_2009": {
+    "sections": {
+      "185": {
+        "title": "Defence disclosure in summary matters",
+        "mandatory_disclosures": [
+          "notice of alibi (if relying on alibi)",
+          "notice of expert evidence to be called",
+          "list of witnesses defence intends to call",
+          "copies of documents defence intends to tender"
+        ],
+        "timing": "reasonable time before hearing"
+      },
+      "186": {
+        "title": "Time for disclosure",
+        "prosecution_timing": "as soon as practicable after charges filed",
+        "ongoing_obligation": "continuous until matter finalized"
+      },
+      "187": {
+        "title": "Prosecution disclosure in summary proceedings",
+        "mandatory_disclosures": [
+          "copy of informant's statement",
+          "copies of all witness statements",
+          "list of physical exhibits with descriptions",
+          "accused's prior criminal convictions",
+          "any material that may assist defence"
+        ],
+        "timing": "before contest mention or as soon as practicable"
+      }
+    }
+  },
+  "Evidence_Act_2008": {
+    "sections": {
+      "59": {
+        "title": "The hearsay rule",
+        "rule": "Evidence of a previous representation made by a person is not admissible to prove the existence of a fact that it can reasonably be supposed that the person intended to assert by the representation",
+        "consequence": "Inadmissible unless exception applies"
+      },
+      "63": {
+        "title": "Exception: civil proceedings—business records",
+        "applies_to": "civil proceedings only",
+        "conditions": [
+          "representation made in business record",
+          "person who made representation had personal knowledge",
+          "representation made in course of business"
+        ]
+      },
+      "69": {
+        "title": "Exception: business records (criminal proceedings)",
+        "applies_to": "criminal proceedings",
+        "conditions": [
+          "document is business record",
+          "representation based on person's personal knowledge",
+          "person made/supplied representation in business course",
+          "document kept in business course"
+        ],
+        "typical_examples": ["police LEAP records", "hospital records", "business transaction logs"]
+      },
+      "137": {
+        "title": "Exclusion of prejudicial evidence in criminal proceedings",
+        "discretion": "Court must refuse to admit evidence if probative value substantially outweighed by danger of unfair prejudice to defendant",
+        "test": "substantial outweighing required",
+        "burden": "accused to raise, prosecution to satisfy court"
+      },
+      "138": {
+        "title": "Exclusion of improperly or illegally obtained evidence",
+        "discretion": "Court may refuse to admit evidence obtained improperly or in consequence of illegality",
+        "considerations": [
+          "probative value of evidence",
+          "importance of evidence in proceeding",
+          "nature of relevant offence/proceeding",
+          "gravity of impropriety or contravention",
+          "whether impropriety deliberate or reckless",
+          "whether impropriety contrary to Australian law",
+          "difficulty of obtaining evidence without impropriety",
+          "whether evidence obtained from accused while under arrest"
+        ]
+      }
+    }
+  },
+  "Magistrates_Court_Act_1989": {
+    "jurisdiction": {
+      "summary_criminal": "All summary offences",
+      "indictable_triable_summarily": "Certain indictable offences with consent",
+      "civil": "Claims up to $100,000"
+    }
+  }
+}
