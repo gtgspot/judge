@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compliance Analysis Workbench - Learning Edition</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-content">
+        <h1>Compliance Analysis Workbench</h1>
+        <p class="subtitle">Step 4: Adaptive Learning &amp; Persistent Intelligence</p>
+      </div>
+      <div class="header-actions">
+        <button id="run-sample-analyses" class="secondary">Run Sample Analyses</button>
+        <button id="export-report" class="primary">Export Enhanced Report</button>
+      </div>
+    </header>
+
+    <main class="app-layout">
+      <section class="panel">
+        <h2>New Analysis</h2>
+        <form id="analysis-form" class="analysis-form">
+          <div class="input-grid">
+            <label class="field">
+              <span>Document A Name</span>
+              <input type="text" id="file-a-name" placeholder="e.g. Exhibit A - Officer Notes" required />
+            </label>
+            <label class="field">
+              <span>Document B Name</span>
+              <input type="text" id="file-b-name" placeholder="e.g. Exhibit B - Statutory Statement" required />
+            </label>
+          </div>
+          <div class="input-grid">
+            <label class="field">
+              <span>Document A Type</span>
+              <input type="text" id="file-a-type" placeholder="e.g. Notes / Statement" />
+            </label>
+            <label class="field">
+              <span>Document B Type</span>
+              <input type="text" id="file-b-type" placeholder="e.g. Report / Transcript" />
+            </label>
+          </div>
+          <label class="field">
+            <span>Document A Content</span>
+            <textarea id="file-a-content" rows="8" placeholder="Paste transcript or notes"></textarea>
+          </label>
+          <label class="field">
+            <span>Document B Content</span>
+            <textarea id="file-b-content" rows="8" placeholder="Paste statutory language or policy"></textarea>
+          </label>
+          <button type="submit" class="primary">Run Analysis</button>
+        </form>
+
+        <section id="analysis-results" class="results hidden" aria-live="polite"></section>
+      </section>
+
+      <section class="panel intelligence-panel">
+        <h2>📊 System Intelligence Summary</h2>
+        <div id="intelligence-summary" class="insights"></div>
+        <section class="intelligence-section">
+          <h3>Cross-Analysis Intelligence</h3>
+          <div id="cross-analysis" class="intelligence-block"></div>
+        </section>
+        <section class="intelligence-section">
+          <h3>Pattern Recognition</h3>
+          <div id="pattern-recognition" class="intelligence-block"></div>
+        </section>
+      </section>
+    </main>
+
+    <section class="panel timeline-panel">
+      <div class="timeline-header">
+        <h2>Chronological Analysis Timeline</h2>
+        <div class="filters">
+          <label>
+            <span>Start Date</span>
+            <input type="date" id="filter-start" />
+          </label>
+          <label>
+            <span>End Date</span>
+            <input type="date" id="filter-end" />
+          </label>
+          <label>
+            <span>Statute</span>
+            <select id="filter-statute">
+              <option value="">All</option>
+            </select>
+          </label>
+          <label>
+            <span>Defect Type</span>
+            <select id="filter-defect">
+              <option value="">All</option>
+            </select>
+          </label>
+          <label>
+            <span>Severity</span>
+            <select id="filter-severity">
+              <option value="">All</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+          </label>
+          <label>
+            <span>Document Type</span>
+            <select id="filter-document">
+              <option value="">All</option>
+            </select>
+          </label>
+          <button id="reset-filters" class="secondary">Reset</button>
+        </div>
+      </div>
+      <div id="timeline-entries" class="timeline"></div>
+    </section>
+
+    <template id="timeline-entry-template">
+      <article class="timeline-entry">
+        <header>
+          <time class="analysis-date"></time>
+          <div class="documents"></div>
+        </header>
+        <div class="defects"></div>
+        <div class="severity"></div>
+        <details>
+          <summary>View Full Analysis</summary>
+          <pre class="full-analysis"></pre>
+        </details>
+      </article>
+    </template>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
