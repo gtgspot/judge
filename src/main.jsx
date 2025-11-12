@@ -31,7 +31,10 @@ async function initializeApp() {
   console.log('✅ Application initialized with Victorian statute database');
 }
 
-initializeApp();
+const appInitialization = initializeApp().catch(error => {
+  console.error('❌ Failed to initialize application', error);
+  throw error;
+});
 
 function App() {
   const [selectedPresetKey, setSelectedPresetKey] = useState(Object.keys(Presets)[0]);
@@ -41,6 +44,7 @@ function App() {
   const [matrix, setMatrix] = useState([]);
   const [interpretations, setInterpretations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const presetList = useMemo(() => Object.entries(Presets), []);
 
   useEffect(() => {
@@ -50,8 +54,16 @@ function App() {
 
   const runAnalysis = async documentText => {
     setLoading(true);
+    setError(null);
     try {
+      await appInitialization;
+      if (!documentText) {
+        throw new Error('No document text provided for analysis.');
+      }
       const preset = Presets[selectedPresetKey];
+      if (!preset) {
+        throw new Error('Selected preset is unavailable.');
+      }
       const result = await preset.analyze(documentText);
       const classifiedIssues = classifyDefects(result.issues);
       const enrichedResult = { ...result, issues: classifiedIssues };
@@ -74,14 +86,22 @@ function App() {
 
       setMatrix(crossReferenceEngine.buildReferenceMatrix(documentText));
       setInterpretations(interpretationEngine.interpret(documentText));
+    } catch (runError) {
+      console.error('Failed to run analysis', runError);
+      setError(runError instanceof Error ? runError.message : 'Unknown error occurred while running analysis.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleFileUpload = async file => {
-    const text = await extractTextFromFile(file);
-    await runAnalysis(text);
+    try {
+      const text = await extractTextFromFile(file);
+      await runAnalysis(text);
+    } catch (uploadError) {
+      console.error('Failed to process uploaded file', uploadError);
+      setError(uploadError instanceof Error ? uploadError.message : 'Unable to read the uploaded file.');
+    }
   };
 
   const handleExportJSON = () => {
@@ -120,6 +140,12 @@ function App() {
 
       <FileUploader onUpload={handleFileUpload} />
 
+      {error && (
+        <div role="alert" className="error">
+          {error}
+        </div>
+      )}
+
       <section className="analysis-actions">
         <button type="button" onClick={handleExportJSON} disabled={!analysisResult}>
           Export JSON
@@ -149,8 +175,10 @@ function App() {
                           <li key={index}>{note}</li>
                         ))}
                       </ul>
-                    ) : (
+                    ) : entry.notes ? (
                       <p>{entry.notes}</p>
+                    ) : (
+                      <p>No interpretive guidance available.</p>
                     )}
                   </li>
                 ))}

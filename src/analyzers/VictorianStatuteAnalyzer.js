@@ -1,19 +1,39 @@
+import statutesData from '../data/victorianStatutes.json';
+
 export class VictorianStatuteAnalyzer {
   constructor() {
     this.statutes = null;
   }
 
   async init() {
-    const response = await fetch('/src/data/victorianStatutes.json');
-    this.statutes = await response.json();
+    if (!this.statutes) {
+      this.statutes = statutesData;
+    }
+    return this.statutes;
+  }
+
+  ensureInitialized() {
+    if (!this.statutes) {
+      throw new Error('VictorianStatuteAnalyzer has not been initialized');
+    }
   }
 
   // Check if document text satisfies statutory requirements
   checkCompliance(documentText, actName, sectionNumber) {
-    const section = this.statutes[actName].sections[sectionNumber];
+    this.ensureInitialized();
+
+    const act = this.statutes?.[actName];
+    const section = act?.sections?.[sectionNumber];
+
+    if (!act || !section) {
+      return null;
+    }
+
+    const normalizedText = typeof documentText === 'string' ? documentText : '';
+
     const results = {
       section: sectionNumber,
-      title: section.title,
+      title: section.title || '',
       compliant: true,
       satisfied: [],
       missing: [],
@@ -23,7 +43,7 @@ export class VictorianStatuteAnalyzer {
     // Check each element
     Object.values(section.subsections || {}).forEach(subsection => {
       subsection.elements?.forEach(element => {
-        const found = this.searchForElement(documentText, element);
+        const found = this.searchForElement(normalizedText, element);
 
         if (found.present) {
           results.satisfied.push({
@@ -31,11 +51,11 @@ export class VictorianStatuteAnalyzer {
             evidence: found.evidence
           });
         } else {
-          results.compliant = false;
+          results.compliant = element.required ? false : results.compliant;
           results.missing.push({
             element: element.name,
-            required: element.required,
-            consequence: element.absence_consequence
+            required: Boolean(element.required),
+            consequence: element.absence_consequence || null
           });
           if (element.absence_consequence) {
             results.consequences.push(element.absence_consequence);
@@ -55,9 +75,13 @@ export class VictorianStatuteAnalyzer {
     };
 
     // Search for keywords
-    if (element.keywords) {
+    if (Array.isArray(element.keywords)) {
       element.keywords.forEach(keyword => {
-        const regex = new RegExp(`.{0,100}${keyword}.{0,100}`, 'gi');
+        if (!keyword) {
+          return;
+        }
+        const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`.{0,100}${escapedKeyword}.{0,100}`, 'gi');
         const matches = text.match(regex);
         if (matches) {
           results.present = true;
@@ -67,9 +91,9 @@ export class VictorianStatuteAnalyzer {
     }
 
     // Search for specific grounds list
-    if (element.grounds_list) {
+    if (Array.isArray(element.grounds_list)) {
       element.grounds_list.forEach(ground => {
-        if (textLower.includes(ground.toLowerCase())) {
+        if (textLower.includes(String(ground).toLowerCase())) {
           results.present = true;
           results.evidence.push(ground);
         }
@@ -81,6 +105,10 @@ export class VictorianStatuteAnalyzer {
 
   // Extract all statutory references from text
   extractReferences(text) {
+    if (typeof text !== 'string' || text.length === 0) {
+      return [];
+    }
+
     const patterns = [
       /section\s+\d+[A-Z]?(?:\(\d+\))?(?:\([a-z]\))?/gi,
       /s\.\s*\d+[A-Z]?(?:\(\d+\))?(?:\([a-z]\))?/gi,
@@ -91,7 +119,7 @@ export class VictorianStatuteAnalyzer {
     patterns.forEach(pattern => {
       const matches = text.match(pattern);
       if (matches) {
-        matches.forEach(m => found.add(m));
+        matches.forEach(match => found.add(match));
       }
     });
 
@@ -100,14 +128,25 @@ export class VictorianStatuteAnalyzer {
 
   // Identify which Acts govern this document
   identifyGoverningActs(references) {
+    this.ensureInitialized();
+
+    if (!Array.isArray(references) || references.length === 0) {
+      return [];
+    }
+
     const acts = new Set();
 
     references.forEach(ref => {
       const sectionNum = this.extractSectionNumber(ref);
 
+      if (!sectionNum) {
+        return;
+      }
+
       // Check each act in database
       Object.keys(this.statutes).forEach(actName => {
-        if (this.statutes[actName].sections?.[sectionNum]) {
+        const act = this.statutes[actName];
+        if (act?.sections?.[sectionNum]) {
           acts.add(actName);
         }
       });
@@ -117,6 +156,9 @@ export class VictorianStatuteAnalyzer {
   }
 
   extractSectionNumber(reference) {
+    if (typeof reference !== 'string') {
+      return null;
+    }
     const match = reference.match(/\d+[A-Z]?/);
     return match ? match[0] : null;
   }

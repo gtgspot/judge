@@ -3,16 +3,23 @@ import { VictorianStatuteAnalyzer } from './VictorianStatuteAnalyzer.js';
 export class InterpretationEngine {
   constructor(statuteAnalyzer = new VictorianStatuteAnalyzer()) {
     this.statuteAnalyzer = statuteAnalyzer;
+    this.initialization = null;
   }
 
   async init() {
-    if (!this.statuteAnalyzer.statutes) {
-      await this.statuteAnalyzer.init();
+    if (!this.initialization) {
+      this.initialization = this.statuteAnalyzer.init();
     }
+    await this.initialization;
   }
 
   interpret(documentText) {
-    const references = this.statuteAnalyzer.extractReferences(documentText);
+    if (!this.statuteAnalyzer.statutes) {
+      return [];
+    }
+
+    const normalizedText = typeof documentText === 'string' ? documentText : '';
+    const references = this.statuteAnalyzer.extractReferences(normalizedText);
     const governingActs = this.statuteAnalyzer.identifyGoverningActs(references);
 
     return references.map(reference => {
@@ -24,13 +31,15 @@ export class InterpretationEngine {
             return null;
           }
 
+          const subsectionSummaries = section.subsections
+            ? Object.values(section.subsections).map(sub => sub.full_text)
+            : null;
+
           return {
             act: actName,
             section: sectionNumber,
-            title: section.title,
-            notes: section.subsections
-              ? Object.values(section.subsections).map(sub => sub.full_text)
-              : section.rule || section.presumption || section.discretion
+            title: section.title || '',
+            notes: subsectionSummaries || section.rule || section.presumption || section.discretion || section.mandatory_disclosures || section.conditions || null
           };
         })
         .filter(Boolean);

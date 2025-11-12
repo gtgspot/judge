@@ -1,3 +1,11 @@
+function createIdentifier() {
+  const cryptoImpl = globalThis.crypto;
+  if (cryptoImpl?.randomUUID) {
+    return cryptoImpl.randomUUID();
+  }
+  return `analysis-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 export class AnalysisDatabase {
   constructor() {
     this.initialized = false;
@@ -13,7 +21,7 @@ export class AnalysisDatabase {
       throw new Error('AnalysisDatabase not initialized');
     }
     const entry = {
-      id: crypto.randomUUID(),
+      id: createIdentifier(),
       createdAt: new Date().toISOString(),
       ...analysis
     };

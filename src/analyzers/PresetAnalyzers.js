@@ -1,23 +1,38 @@
 import { VictorianStatuteAnalyzer } from './VictorianStatuteAnalyzer.js';
 
 const statuteAnalyzer = new VictorianStatuteAnalyzer();
-await statuteAnalyzer.init();
+let analyzerInitialization;
+
+function ensureAnalyzerReady() {
+  if (!analyzerInitialization) {
+    analyzerInitialization = statuteAnalyzer.init();
+  }
+  return analyzerInitialization;
+}
 
 function createPreset(name, issueType = 'Statutory Non-Compliance') {
   return {
     name,
     async analyze(documentText) {
-      const references = statuteAnalyzer.extractReferences(documentText);
+      await ensureAnalyzerReady();
+
+      const normalizedText = typeof documentText === 'string' ? documentText : '';
+      const references = statuteAnalyzer.extractReferences(normalizedText);
       const governingActs = statuteAnalyzer.identifyGoverningActs(references);
 
       const complianceChecks = [];
       references.forEach(ref => {
         const sectionNum = statuteAnalyzer.extractSectionNumber(ref);
+        if (!sectionNum) {
+          return;
+        }
         governingActs.forEach(act => {
-          const statute = statuteAnalyzer.statutes[act];
+          const statute = statuteAnalyzer.statutes?.[act];
           if (statute?.sections?.[sectionNum]) {
-            const result = statuteAnalyzer.checkCompliance(documentText, act, sectionNum);
-            complianceChecks.push(result);
+            const result = statuteAnalyzer.checkCompliance(normalizedText, act, sectionNum);
+            if (result) {
+              complianceChecks.push(result);
+            }
           }
         });
       });
@@ -29,11 +44,11 @@ function createPreset(name, issueType = 'Statutory Non-Compliance') {
             issues.push({
               severity: missing.required ? 'HIGH' : 'MEDIUM',
               type: issueType,
-              statute: `${check.section} ${check.title}`,
+              statute: `${check.section} ${check.title}`.trim(),
               element: missing.element,
               description: `Missing required element: ${missing.element}`,
               consequence: missing.consequence,
-              line: this.findLineNumber(documentText, missing.element)
+              line: this.findLineNumber(normalizedText, missing.element)
             });
           });
         }
@@ -44,12 +59,15 @@ function createPreset(name, issueType = 'Statutory Non-Compliance') {
         governingActs,
         complianceChecks,
         issues,
-        wordCount: documentText.split(/\s+/).length,
-        lineCount: documentText.split('\n').length
+        wordCount: normalizedText ? normalizedText.split(/\s+/).filter(Boolean).length : 0,
+        lineCount: normalizedText ? normalizedText.split('\n').length : 0
       };
     },
 
     findLineNumber(text, searchTerm) {
+      if (!text || !searchTerm) {
+        return null;
+      }
       const lines = text.split('\n');
       for (let i = 0; i < lines.length; i += 1) {
         if (lines[i].toLowerCase().includes(searchTerm.toLowerCase())) {
